@@ -18,7 +18,7 @@ const SEED_PRODUCTS = [
   { id: 12, title: 'Graphic Tee',            price: 17.99,  description: 'Bold graphic print t-shirt in black. 100% organic cotton.',                                                  category: "men's clothing",   imageUrl: 'https://i.imgur.com/aJGMQQt.jpeg' },
 ];
 
-// ─── In-memory store (persists as long as the tab is open) ───────────────────
+// ─── In-memory store ─────────────────────────────────────────────────────────
 let _products = [...SEED_PRODUCTS];
 let _nextId   = 100;
 
@@ -126,7 +126,15 @@ export function getAllUsers() {
     // fall through
   }
   const defaults = [
-    { id: 1, name: 'Admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' },
+    {
+      id: 1,
+      name: 'Admin',
+      email: 'admin@example.com',
+      // пароль хранится в открытом виде — это mock, не продакшн
+      password: 'password',
+      role: 'admin',
+      createdAt: '2024-01-01',
+    },
   ];
   localStorage.setItem('allUsers', JSON.stringify(defaults));
   return defaults;
@@ -137,7 +145,6 @@ export function updateUserRole(userId, role) {
   const updated = users.map((u) => (u.id === userId ? { ...u, role } : u));
   localStorage.setItem('allUsers', JSON.stringify(updated));
 
-  // Keep current session in sync if editing self
   const current = getUser();
   if (current && current.id === userId) {
     const next = { ...current, role };
@@ -153,51 +160,51 @@ export function deleteUser(userId) {
   return users;
 }
 
-// ─── Auth flow helpers (used by Login/Register pages) ────────────────────────
+// ─── Auth flow ────────────────────────────────────────────────────────────────
 export async function loginUser({ email, password }) {
   await delay(rand(400, 700));
 
-  const ADMIN_EMAIL = 'admin@example.com';
-  const ADMIN_PASS  = 'password';
-
-  if (email === ADMIN_EMAIL && password === ADMIN_PASS) {
-    const user = { id: 1, name: 'Admin', email, role: 'admin' };
-    _ensureUserInList(user);
-    return user;
-  }
-
   const users = getAllUsers();
   const found = users.find((u) => u.email === email);
-  if (found && password === 'password') return found;
 
-  throw new Error('Invalid credentials. Use admin@example.com / password');
+  if (!found) {
+    throw new Error('Пользователь с таким email не найден');
+  }
+
+  if (found.password !== password) {
+    throw new Error('Неверный пароль');
+  }
+
+  // возвращаем без поля password
+  const { password: _pw, ...userWithoutPassword } = found;
+  return userWithoutPassword;
 }
 
 export async function registerUser({ name, email, password }) {
   await delay(rand(500, 900));
 
-  if (password.length < 6) throw new Error('Password must be at least 6 characters');
+  if (password.length < 6) {
+    throw new Error('Пароль должен быть не менее 6 символов');
+  }
 
   const users = getAllUsers();
-  if (users.find((u) => u.email === email)) throw new Error('Email already registered');
+  if (users.find((u) => u.email === email)) {
+    throw new Error('Email уже зарегистрирован');
+  }
 
   const newUser = {
     id: Date.now(),
     name,
     email,
+    password, // сохраняем пароль чтобы потом войти
     role: 'user',
     createdAt: new Date().toISOString().slice(0, 10),
   };
 
   users.push(newUser);
   localStorage.setItem('allUsers', JSON.stringify(users));
-  return newUser;
-}
 
-function _ensureUserInList(user) {
-  const users = getAllUsers();
-  if (!users.find((u) => u.email === user.email)) {
-    users.push({ ...user, createdAt: new Date().toISOString().slice(0, 10) });
-    localStorage.setItem('allUsers', JSON.stringify(users));
-  }
+  // возвращаем без поля password
+  const { password: _pw, ...userWithoutPassword } = newUser;
+  return userWithoutPassword;
 }
