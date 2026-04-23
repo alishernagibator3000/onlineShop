@@ -34,12 +34,12 @@ export default function App() {
 
           {/* Protected — any logged-in user */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard"        element={<Dashboard />} />
-            <Route path="/products/create"  element={<Create />} />
+            <Route path="/dashboard"         element={<Dashboard />} />
+            <Route path="/products/create"   element={<Create />} />
             <Route path="/products/:id/edit" element={<Edit />} />
-            <Route path="/profile"          element={<Profile />} />
-            <Route path="/favorites"        element={<Favorites />} />
-            <Route path="/my-items"         element={<MyItems />} />
+            <Route path="/profile"           element={<Profile />} />
+            <Route path="/favorites"         element={<Favorites />} />
+            <Route path="/my-items"          element={<MyItems />} />
           </Route>
 
           {/* Admin only */}

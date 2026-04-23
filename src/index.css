@@ -40,6 +40,46 @@ nav { background: #fff; border-bottom: 1px solid #e8e8e6; position: sticky; top:
 .nav-links a:hover, .nav-links button:hover { background: #f3f3f1; color: #111; }
 .nav-links a.active { color: #111; font-weight: 500; }
 
+/* Admin link in navbar */
+.nav-admin-link {
+  color: #444 !important;
+  font-weight: 500 !important;
+  background: #f3f3f1 !important;
+  border: 1px solid #e0e0de !important;
+  border-radius: 6px !important;
+  font-size: 0.8125rem !important;
+  padding: 0.3rem 0.7rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+.nav-admin-link:hover { background: #ebebea !important; color: #111 !important; }
+.nav-admin-link.active { background: #111 !important; color: #fff !important; border-color: #111 !important; }
+
+/* Profile button in navbar */
+.nav-profile-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 0.25rem 0.625rem 0.25rem 0.25rem !important;
+}
+.nav-avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #111; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.6875rem; font-weight: 600; flex-shrink: 0;
+}
+.nav-logout-btn { color: #999 !important; }
+
+/* Register button */
+.nav-register-btn {
+  background: #111 !important; color: #fff !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+.nav-register-btn:hover { background: #333 !important; }
+.nav-register-btn.active { background: #333 !important; }
+
 /* ── Page header ── */
 .page-header {
   display: flex; align-items: baseline;
@@ -166,6 +206,36 @@ nav { background: #fff; border-bottom: 1px solid #e8e8e6; position: sticky; top:
 .btn-secondary:hover:not(:disabled) { background: #f3f3f1; color: #111; }
 .btn-ghost     { background: transparent; color: #555; border-color: transparent; }
 .btn-ghost:hover:not(:disabled)     { background: #f3f3f1; color: #111; }
+
+/* Small variant */
+.btn-sm {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8125rem;
+}
+
+/* ── FAB (floating add button) ── */
+.fab-add {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  transition: background 0.15s, transform 0.15s;
+  z-index: 90;
+  line-height: 1;
+}
+.fab-add:hover { background: #333; transform: scale(1.07); }
+.fab-add:active { transform: scale(0.96); }
 
 /* ── Forms ── */
 .form-wrap { max-width: 440px; margin: 0 auto; }
@@ -309,6 +379,24 @@ nav { background: #fff; border-bottom: 1px solid #e8e8e6; position: sticky; top:
 .stat-label { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 500; margin-bottom: 0.375rem; }
 .stat-value { font-size: 1.625rem; font-weight: 600; letter-spacing: -0.5px; }
 
+/* ── Dashboard header ── */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid #e8e8e6;
+  border-radius: 10px;
+}
+.dashboard-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #111; color: #fff; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem; font-weight: 600;
+}
+
 /* ── Table ── */
 .table-wrap { border: 1px solid #e8e8e6; border-radius: 10px; overflow: hidden; background: #fff; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
@@ -353,6 +441,42 @@ nav { background: #fff; border-bottom: 1px solid #e8e8e6; position: sticky; top:
   background: #f3f3f1; color: #888; border: 1px solid #e8e8e6;
 }
 
+/* ── Admin cards ── */
+.admin-card {
+  border: 1px solid #e8e8e6;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.admin-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #f0f0ee;
+}
+
+/* Mini avatar (used in admin tables) */
+.mini-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #f0edfe; color: #3c3489;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 600; flex-shrink: 0;
+  border: 1px solid #afa9ec;
+}
+
+/* Role bar (admin overview) */
+.admin-role-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: #f0f0ee;
+  overflow: hidden;
+  display: flex;
+}
+.admin-role-fill { height: 100%; }
+.admin-role-admin { background: #7F77DD; }
+.admin-role-user  { background: #e0e0de; }
+
 /* ── Mobile responsive ── */
 @media (max-width: 600px) {
   .nav-links { gap: 0; }
@@ -364,4 +488,5 @@ nav { background: #fff; border-bottom: 1px solid #e8e8e6; position: sticky; top:
   .filter-input, .filter-select { width: 100%; min-width: unset; }
   .price-range { width: 100%; }
   .price-input { flex: 1 !important; min-width: unset !important; }
+  .fab-add { bottom: 1.25rem; right: 1.25rem; }
 }

@@ -23,30 +23,37 @@ export default function Navbar() {
 
           {isAuth ? (
             <>
-              <li><NavLink to="/dashboard">Dashboard</NavLink></li>
-              <li><NavLink to="/favorites">Избранное</NavLink></li>
               <li><NavLink to="/my-items">Мои товары</NavLink></li>
-              <li><NavLink to="/products/create">Добавить</NavLink></li>
+              <li><NavLink to="/favorites">Избранное</NavLink></li>
               {isAdmin && (
                 <li>
-                  <NavLink
-                    to="/admin"
-                    style={({ isActive }) => ({
-                      color: isActive ? '#111' : '#c0392b',
-                      fontWeight: 500,
-                    })}
-                  >
-                    Admin
+                  <NavLink to="/admin" className="nav-admin-link">
+                    ⚙ Админка
                   </NavLink>
                 </li>
               )}
-              <li><NavLink to="/profile">{user?.name?.split(' ')[0] || 'Профиль'}</NavLink></li>
-              <li><button onClick={handleLogout}>Выйти</button></li>
+              <li className="nav-profile-item">
+                <NavLink to="/profile" className="nav-profile-btn">
+                  <span className="nav-avatar">
+                    {user?.name?.[0]?.toUpperCase() || '?'}
+                  </span>
+                  <span>{user?.name?.split(' ')[0] || 'Профиль'}</span>
+                </NavLink>
+              </li>
+              <li>
+                <button onClick={handleLogout} className="nav-logout-btn">
+                  Выйти
+                </button>
+              </li>
             </>
           ) : (
             <>
               <li><NavLink to="/login">Войти</NavLink></li>
-              <li><NavLink to="/register">Регистрация</NavLink></li>
+              <li>
+                <NavLink to="/register" className="nav-register-btn">
+                  Регистрация
+                </NavLink>
+              </li>
             </>
           )}
         </ul>

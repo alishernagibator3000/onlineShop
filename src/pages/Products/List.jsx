@@ -66,11 +66,13 @@ export default function List() {
   return (
     <div>
       <div className="page-header">
-        <h1>Каталог</h1>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <span className="muted-text">{filtered.length} из {products.length}</span>
-          {isAuth && <Link to="/products/create" className="btn btn-primary">+ Добавить</Link>}
+        <div>
+          <h1>Каталог</h1>
+          <p className="muted-text" style={{ marginTop: '0.2rem' }}>
+            {filtered.length} из {products.length} товаров
+          </p>
         </div>
+        {/* Кнопка добавления — только в разделе Мои товары, здесь убрана */}
       </div>
 
       <FilterBar
@@ -91,6 +93,17 @@ export default function List() {
         />
       ) : (
         <ProductGrid products={filtered} />
+      )}
+
+      {/* Sticky add button for logged-in users — bottom right corner shortcut */}
+      {isAuth && (
+        <Link
+          to="/products/create"
+          className="fab-add"
+          title="Добавить товар"
+        >
+          +
+        </Link>
       )}
     </div>
   );
