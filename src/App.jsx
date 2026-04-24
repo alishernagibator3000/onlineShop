@@ -18,6 +18,7 @@ import Profile    from './pages/Profile.jsx';
 import Favorites  from './pages/Favorites.jsx';
 import MyItems    from './pages/MyItems.jsx';
 import Admin      from './pages/Admin.jsx';
+import Cart       from './pages/Cart.jsx';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/"         element={<Home />} />
           <Route path="/products" element={<List />} />
           <Route path="/products/:id" element={<Details />} />
+          <Route path="/cart"     element={<Cart />} />
           <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
 

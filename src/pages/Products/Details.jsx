@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   getProductById, deleteProduct,
-  isMyItem, isFavorite, toggleFavorite,
+  isMyItem, isFavorite, toggleFavorite, addToCart, getCart
 } from '../../services/api.js';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useToast } from '../../hooks/useToast.js';
@@ -22,8 +22,18 @@ export default function Details() {
   const [deleting, setDeleting]   = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [fav, setFav]             = useState(() => isFavorite(Number(id)));
+  const [inCart, setInCart]       = useState(false);
 
   const owner = isAuth && (isMyItem(Number(id)) || isAdmin);
+
+  useEffect(() => {
+    const checkCart = () => {
+      setInCart(getCart().some(c => Number(c.id) === Number(id)));
+    };
+    checkCart();
+    window.addEventListener('cart-updated', checkCart);
+    return () => window.removeEventListener('cart-updated', checkCart);
+  }, [id]);
 
   useEffect(() => {
     setLoading(true);
@@ -50,6 +60,12 @@ export default function Details() {
     toggleFavorite(Number(id));
     setFav((v) => !v);
     addToast(fav ? 'Убрано из избранного' : 'Добавлено в избранное', 'success');
+  }
+
+  function handleAddToCart() {
+    addToCart(product);
+    addToast('Добавлено в корзину', 'success');
+    window.dispatchEvent(new Event('cart-updated'));
   }
 
   if (loading) return <Spinner />;
@@ -93,7 +109,14 @@ export default function Details() {
           <p className="details-price">${Number(product.price).toFixed(2)}</p>
           <p className="details-desc">{product.description}</p>
 
-          <div className="details-actions">
+            <div className="details-actions">
+              {inCart ? (
+                <Link to="/cart" className="btn btn-secondary">В корзине</Link>
+              ) : (
+                <button className="btn btn-primary" onClick={handleAddToCart}>
+                  Добавить в корзину
+                </button>
+              )}
             {isAuth && (
               <button
                 className="btn btn-secondary"

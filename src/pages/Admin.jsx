@@ -4,15 +4,33 @@ import { Link } from 'react-router-dom';
 import {
   getAllUsers, updateUserRole, deleteUser,
   getProducts, deleteProduct, removeMyItem,
+  getAdminNotifications, markNotificationsRead, clearAdminNotifications
 } from '../services/api.js';
 import { useToast } from '../hooks/useToast.js';
 import Spinner from '../components/Spinner.jsx';
 import ConfirmModal from '../components/ConfirmModal.jsx';
 
-const TABS = ['Обзор', 'Пользователи', 'Товары'];
+const TABS = ['Обзор', 'Уведомления', 'Пользователи', 'Товары'];
 
 export default function Admin() {
-  const [tab, setTab] = useState('Обзор');
+  const [tab, setTab] = useState(() => {
+    const hash = decodeURIComponent(window.location.hash.replace('#', ''));
+    return TABS.includes(hash) ? hash : 'Обзор';
+  });
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = decodeURIComponent(window.location.hash.replace('#', ''));
+      if (TABS.includes(hash)) setTab(hash);
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const handleTabChange = (t) => {
+    setTab(t);
+    window.location.hash = t;
+  };
 
   return (
     <div>
@@ -31,16 +49,75 @@ export default function Admin() {
           <button
             key={t}
             className={`tab-btn${tab === t ? ' active' : ''}`}
-            onClick={() => setTab(t)}
+            onClick={() => handleTabChange(t)}
           >
             {t}
           </button>
         ))}
       </div>
 
-      {tab === 'Обзор'        && <AdminOverview onTabChange={setTab} />}
+      {tab === 'Обзор'        && <AdminOverview onTabChange={handleTabChange} />}
+      {tab === 'Уведомления'  && <AdminNotifications />}
       {tab === 'Пользователи' && <AdminUsers />}
       {tab === 'Товары'       && <AdminProducts />}
+    </div>
+  );
+}
+
+/* ── Notifications tab ── */
+function AdminNotifications() {
+  const [notifs, setNotifs] = useState(() => getAdminNotifications());
+
+  useEffect(() => {
+    const hasUnread = notifs.some(n => !n.read);
+    if (hasUnread) {
+      markNotificationsRead();
+      window.dispatchEvent(new Event('notif-updated'));
+      setNotifs(prev => prev.map(n => ({ ...n, read: true })));
+    }
+  }, [notifs]);
+
+  if (notifs.length === 0) {
+    return (
+      <div className="empty-state">
+        <p>Уведомлений пока нет</p>
+      </div>
+    );
+  }
+
+  const handleClear = () => {
+    if (window.confirm("Удалить все уведомления?")) {
+      clearAdminNotifications();
+      setNotifs([]);
+      window.dispatchEvent(new Event('notif-updated'));
+    }
+  };
+
+  return (
+    <div className="admin-card">
+      <div className="admin-card-header">
+        <span className="section-title" style={{ margin: 0 }}>Уведомления о заказах</span>
+        <button className="btn btn-ghost btn-sm" onClick={handleClear}>
+          Очистить все
+        </button>
+      </div>
+      <div>
+        {notifs.map((n) => (
+          <div key={n.id} className={`notif-item ${!n.read ? 'notif-item--unread' : ''}`}>
+            <div>
+              <div className="notif-item-header">
+                <span className="notif-item-title">Новый заказ #{n.orderId}</span>
+                <span className="notif-item-date">{n.date}</span>
+              </div>
+              <div className="notif-item-body">
+                <p><strong>Покупатель:</strong> {n.userName} ({n.userEmail})</p>
+                <p><strong>Товаров:</strong> {n.itemsCount} шт.</p>
+              </div>
+            </div>
+            <div className="notif-item-price">${n.total}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

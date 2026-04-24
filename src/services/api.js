@@ -117,6 +117,119 @@ export function isMyItem(id) {
   return getMyItemIds().includes(Number(id));
 }
 
+// ─── Cart ────────────────────────────────────────────────────────────────────
+export function getCart() {
+  try {
+    return JSON.parse(localStorage.getItem('cart') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+export function addToCart(product) {
+  const cart = getCart();
+  const idx = cart.findIndex((c) => Number(c.id) === Number(product.id));
+  if (idx !== -1) {
+    cart[idx].qty = (cart[idx].qty || 1) + 1;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  return cart;
+}
+
+export function removeFromCart(productId) {
+  const cart = getCart().filter((c) => Number(c.id) !== Number(productId));
+  localStorage.setItem('cart', JSON.stringify(cart));
+  return cart;
+}
+
+export function clearCart() {
+  localStorage.removeItem('cart');
+}
+
+export function updateCartQty(productId, qty) {
+  const cart = getCart();
+  const idx = cart.findIndex((c) => Number(c.id) === Number(productId));
+  if (idx !== -1) {
+    if (qty <= 0) {
+      cart.splice(idx, 1);
+    } else {
+      cart[idx].qty = qty;
+    }
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  return cart;
+}
+
+// ─── Admin Notifications ─────────────────────────────────────────────────────
+export function getAdminNotifications() {
+  try {
+    return JSON.parse(localStorage.getItem('admin_notifs') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+export function getUnreadNotificationCount() {
+  return getAdminNotifications().filter((n) => !n.read).length;
+}
+
+export function markNotificationsRead() {
+  const list = getAdminNotifications().map((n) => ({ ...n, read: true }));
+  localStorage.setItem('admin_notifs', JSON.stringify(list));
+}
+
+export function clearAdminNotifications() {
+  localStorage.setItem('admin_notifs', JSON.stringify([]));
+}
+
+// ─── Orders ──────────────────────────────────────────────────────────────────
+export function getOrders(email) {
+  try {
+    const all = JSON.parse(localStorage.getItem('orders') || '[]');
+    return email ? all.filter((o) => o.userEmail === email) : all;
+  } catch {
+    return [];
+  }
+}
+
+export async function placeOrder({ user, cart, delivery }) {
+  await delay(rand(500, 800));
+  const order = {
+    id: 'ORD-' + Date.now(),
+    userName: user.name,
+    userEmail: user.email,
+    date: new Date().toLocaleString('ru-RU'),
+    items: cart,
+    total: cart.reduce((s, c) => s + c.price * (c.qty || 1), 0).toFixed(2),
+    delivery,
+  };
+
+  const orders = getOrders();
+  orders.unshift(order);
+  localStorage.setItem('orders', JSON.stringify(orders));
+  
+  // Create admin notification
+  const notif = {
+    id: Date.now(),
+    orderId: order.id,
+    read: false,
+    date: order.date,
+    userName: user.name,
+    userEmail: user.email,
+    total: order.total,
+    itemsCount: cart.reduce((s, c) => s + (c.qty || 1), 0),
+  };
+  const notifs = getAdminNotifications();
+  notifs.unshift(notif);
+  localStorage.setItem('admin_notifs', JSON.stringify(notifs));
+  window.dispatchEvent(new Event('notif-updated'));
+
+  localStorage.removeItem('cart');
+  return order;
+}
+
 // ─── Admin: users mock ───────────────────────────────────────────────────────
 export function getAllUsers() {
   try {
