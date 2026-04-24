@@ -22,7 +22,7 @@ import Cart       from './pages/Cart.jsx';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/onlineShop">
       <Toast />
       <Routes>
         <Route element={<MainLayout />}>
